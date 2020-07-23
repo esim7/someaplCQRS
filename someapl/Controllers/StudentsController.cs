@@ -7,8 +7,10 @@ using AutoMapper;
 using Domain.Models.Entities;
 using Infrastructure.Database.DTO;
 using Infrastructure.Database.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using someapl.Requests;
 using someapl.Responses;
 
 namespace someapl.Controllers
@@ -18,48 +20,55 @@ namespace someapl.Controllers
     public class StudentsController : ControllerBase
     {
         private readonly IRepository<StudentDto> _studentRepository;
-        private readonly IMapper _mapper;
+        private readonly IMediator _mediator;
 
-        public StudentsController(IRepository<StudentDto> studentRepository, IMapper mapper)
+        public StudentsController(IRepository<StudentDto> studentRepository, IMediator mediator)
         {
             _studentRepository = studentRepository;
-            _mapper = mapper;
+            _mediator = mediator;
         }
 
         [HttpGet]
         public IActionResult Get()
         {
-            var students = _studentRepository.GetAll();
-            return Ok(students);
+            var request = new GetStudents();
+            var response = _mediator.Send(request);
+
+            return Ok(response.Result);
+        }
+
+        [HttpGet("{id}")]
+        public IActionResult Get(int id)
+        {
+            var request = new GetStudentById();
+            var response = _mediator.Send(request);
+
+            return Ok(response.Result);
+
+            var result = _studentRepository.GetById(id);
+            return Ok(result);
         }
 
         //[HttpGet("{id}")]
         //public IActionResult Get(int id)
         //{
         //    var result = _studentRepository.GetById(id);
-        //    return Ok(result);
+
+        //    var response = new StudentResponse();
+
+        //    if (result != null)
+        //    {
+        //        response = _mapper.Map<StudentResponse>(result);
+        //        response.StatusCode = HttpStatusCode.OK;
+        //    }
+        //    else
+        //    {
+        //        response.StatusCode = HttpStatusCode.NotFound;
+        //        response.ErrorMessage = "Student not found!";
+        //    }
+
+        //    return Ok(response);
         //}
-
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
-        {
-            var result = _studentRepository.GetById(id);
-
-            var response = new StudentResponse();
-
-            if (result != null)
-            {
-                response = _mapper.Map<StudentResponse>(result);
-                response.StatusCode = HttpStatusCode.OK;
-            }
-            else
-            {
-                response.StatusCode = HttpStatusCode.NotFound;
-                response.ErrorMessage = "Student not found!";
-            }
-
-            return Ok(response);
-        }
 
         [HttpPost]
         public IActionResult Create(StudentDto studentDto)

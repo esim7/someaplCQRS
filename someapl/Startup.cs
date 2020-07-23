@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Models;
 using Infrastructure.Database.Extensions;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ namespace someapl
 
             services.AddRepository();
             services.AddAutoMapper(typeof(Startup));
+            services.AddMediatR(typeof(Startup));
 
             services.AddControllers();
         }

@@ -9,6 +9,7 @@ namespace someapl.Profiles
         public EntityToDtoProfile()
         {
             CreateMap<Student, StudentDto>();
+            CreateMap<Course, CourseDto>();
         }
     }
 }
