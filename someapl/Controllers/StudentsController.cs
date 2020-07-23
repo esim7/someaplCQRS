@@ -10,6 +10,7 @@ using Infrastructure.Database.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using someapl.Commands;
 using someapl.Requests;
 using someapl.Responses;
 
@@ -19,34 +20,54 @@ namespace someapl.Controllers
     [ApiController]
     public class StudentsController : ControllerBase
     {
-        private readonly IRepository<StudentDto> _studentRepository;
         private readonly IMediator _mediator;
 
-        public StudentsController(IRepository<StudentDto> studentRepository, IMediator mediator)
+        public StudentsController(IMediator mediator)
         {
-            _studentRepository = studentRepository;
             _mediator = mediator;
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            var request = new GetStudents();
-            var response = _mediator.Send(request);
+            var request = new GetStudentsRequest();
+            var response = await _mediator.Send(request);
 
-            return Ok(response.Result);
+            return Ok(response);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            var request = new GetStudentById();
-            var response = _mediator.Send(request);
+            var request = new GetStudentByIdRequest(id);
+            var response = await _mediator.Send(request);
 
-            return Ok(response.Result);
+            return Ok(response);
+        }
 
-            var result = _studentRepository.GetById(id);
+        [HttpPost]
+        public async Task<IActionResult> Create(StudentDto studentDto)
+        {
+            var createStudentCommand = new CreateStudentCommand(studentDto);
+            var response = await _mediator.Send(createStudentCommand);
+
+            return Ok(response);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Edit(int id, [FromBody] StudentDto studentDto)
+        {
+            var result = _studentRepository.Update(id, studentDto);
+
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var removeStudentCommand = new RemoveStudentCommand(id);
+            var response = await _mediator.Send(removeStudentCommand);
+            return Ok(response);
         }
 
         //[HttpGet("{id}")]
@@ -69,27 +90,5 @@ namespace someapl.Controllers
 
         //    return Ok(response);
         //}
-
-        [HttpPost]
-        public IActionResult Create(StudentDto studentDto)
-        {
-            var result = _studentRepository.Create(studentDto);
-            return Ok(result);
-        }
-
-        [HttpPut ("{id}")]
-        public IActionResult Edit(int id, [FromBody]StudentDto studentDto)
-        {
-            var result = _studentRepository.Update(id, studentDto);
-
-            return Ok(result);
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
-        {
-            var result = _studentRepository.Remove(id);
-            return Ok(result);
-        }
     }
 }

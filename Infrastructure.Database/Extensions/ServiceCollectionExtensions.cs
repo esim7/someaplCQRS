@@ -11,6 +11,7 @@ namespace Infrastructure.Database.Extensions
         public static IServiceCollection AddRepository(this IServiceCollection services)
         {
             services.AddScoped<IRepository<StudentDto>, StudentRepository>();
+            services.AddScoped<IRepository<CourseDto>, CourseRepository>();
             return services;
         }
     }

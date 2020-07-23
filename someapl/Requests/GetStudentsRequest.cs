@@ -4,7 +4,7 @@ using MediatR;
 
 namespace someapl.Requests
 {
-    public class GetStudents : IRequest<List<StudentDto>>
+    public class GetStudentsRequest : IRequest<List<StudentDto>>
     {
         
     }
