@@ -55,11 +55,13 @@ namespace someapl.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult Edit(int id, [FromBody] StudentDto studentDto)
+        public async Task<IActionResult> Edit(int id, [FromBody] StudentDto studentDto)
         {
-            var result = _studentRepository.Update(id, studentDto);
+            var request = new EditStudentRequest(id);
+            var editStudentCommand = new EditStudentCommand(request, studentDto);
+            var response = await _mediator.Send(editStudentCommand);
 
-            return Ok(result);
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
